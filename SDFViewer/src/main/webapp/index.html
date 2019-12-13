@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Start Page</title>
+        <title>SDFViewer</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <form action="SDFServlet" method="post" enctype="multipart/form-data">
+            File:<input type="file" name="file" accept=".sdf"/><p/>
+            <input type="submit" value="OK" />
+        </form>
     </body>
 </html>
