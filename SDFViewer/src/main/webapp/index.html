@@ -5,17 +5,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <!--
-        <form action="SDFServlet" method="post" enctype="multipart/form-data">
-            File:<input type="file" name="file" accept=".sdf"/><p/>
-            <input type="submit" value="OK" />
-        </form>
-        -->
-        
         <form id="form" >
-            File:<input type="file" name="file" id="the-file" accept=".sdf" /><p/>
-            <input type="button" id="button" value="OK" onClick="performAjaxSubmit();"/> 
+            File:<input type="file" name="file" id="the-file" accept=".sdf" onchange="performAjaxSubmit();" />
+            <input type="button" id="button" value="OK" onClick="readJson();"/> 
         </form>
+        <div id="data"></div>
+
         <script type="text/javascript">
             function performAjaxSubmit() {
                 var file = document.getElementById('the-file').files[0];
@@ -24,23 +19,30 @@
                 var xhr = new XMLHttpRequest();
                 xhr.open("post", "SDFServlet", true);
                 xhr.send(formdata);
-               /* 
-                xhr.onload = function (e) {
-                    if (this.status === 200) {
-                       alert(this.responseText);
-                    }
-                };*/
-            };
-            
-        /*    $.getJSON('SDFServlet', function (data) {
-                var table = $('<table>').appendTo($('#data'));
-                $.each(data, function (i, compound) {
-                    var row = $('<tr>').appendTo(table);
-                    $('<td>').text(compound.Chemical_Name).appendTo(row);
-                    $('<td>').text(compound.ID).appendTo(row);
-                });
-            });*/
+            }
+            ;
         </script>
-        
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script>
+            function readJson() {
+                $.getJSON("SDFServlet", function (compounds) {
+                    $.each(compounds, function (i, items) {
+                        var table = $('<table>').appendTo($('#data'));
+                        $.each(items, function (name, val) {
+                            if (name !== "Structure") {
+                                var row = $('<tr>').appendTo(table);
+                                $('<td>').text(name).appendTo(row);
+                                $('<td>').text(val).appendTo(row);
+                            }
+                        });
+                        $('<tr>').appendTo(table);
+                        $('<tr>').appendTo(table);
+                        $('<tr>').appendTo(table);
+                        $('<tr>').appendTo(table);
+                    });
+                });
+            }
+            ;
+        </script>
     </body>
 </html>

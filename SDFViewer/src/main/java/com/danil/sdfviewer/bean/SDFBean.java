@@ -18,38 +18,17 @@ import javax.ejb.Stateful;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 /**
  *
  * @author danil
  */
 @Stateful
 public class SDFBean {
-    private static List<Compound> compoundsList;
-   // private static List<JSONObject> jsonCompoundsList;
-    
-    public SDFBean(){
-        
-       // jsonCompoundsList = new ArrayList<>();
-    }
-    
-    public static void readJsonFile() throws FileNotFoundException, IOException, ParseException{
-        JSONParser parser = new JSONParser(); 
-        JSONArray compoundsArray = (JSONArray) parser.parse(new FileReader(System.getProperty("java.io.tmpdir") + "\\sdfv_output.json"));
-        compoundsList = new ArrayList<>();
-        
-        for (Object o : compoundsArray){
-            Compound compound = new Compound();
-            JSONObject comp = (JSONObject)o;
-            compound.structure = (String)comp.get("Structure");
-            for(Object i : comp.keySet()){
-                String itemName = i.toString();
-                String itemValue = (comp.get(itemName)).toString();
-                compound.dataItems.put(itemName, itemValue);
-            }
-            compoundsList.add(compound);
-           // jsonCompoundsList.add(comp);
-          }
-    }
+    //  private static List<Compound> compoundsList;
+    //  private static List<JSONObject> jsonCompoundsList;
+
+    private static JSONArray compoundsArray;
 
     public static void generateJsonFile(InputStream fileContent) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(fileContent));
@@ -87,6 +66,30 @@ public class SDFBean {
         lines.add("]");
         Path file = Paths.get(System.getProperty("java.io.tmpdir") + "\\sdfv_output.json");
         Files.write(file, lines, StandardCharsets.UTF_8);
+        JSONParser parser = new JSONParser();
+        compoundsArray = (JSONArray) parser.parse(new FileReader(System.getProperty("java.io.tmpdir") + "\\sdfv_output.json"));
+
+    }
+
+    /*
+    public static void readJsonFile() throws FileNotFoundException, IOException, ParseException{
+        JSONParser parser = new JSONParser(); 
+        compoundsArray = (JSONArray) parser.parse(new FileReader(System.getProperty("java.io.tmpdir") + "\\sdfv_output.json"));
+        compoundsList = new ArrayList<>();
+        jsonCompoundsList = new ArrayList<>();
+        
+        for (Object o : compoundsArray){
+            Compound compound = new Compound();
+            JSONObject comp = (JSONObject)o;
+            compound.structure = (String)comp.get("Structure");
+            for(Object i : comp.keySet()){
+                String itemName = i.toString();
+                String itemValue = (comp.get(itemName)).toString();
+                compound.dataItems.put(itemName, itemValue);
+            }
+            compoundsList.add(compound);
+            jsonCompoundsList.add(comp);
+          }
     }
 
     public static List<Compound> getCompoundsList() {
@@ -97,21 +100,28 @@ public class SDFBean {
         SDFBean.compoundsList = compoundsList;
     }
 
-  /*  public static List<JSONObject> getJsonCompoundsList() {
+    public static List<JSONObject> getJsonCompoundsList() {
         return jsonCompoundsList;
-    }*/
+    }
 
-   /* public static void setJsonCompoundsList(List<JSONObject> jsonCompoundsList) {
+    public static void setJsonCompoundsList(List<JSONObject> jsonCompoundsList) {
         SDFBean.jsonCompoundsList = jsonCompoundsList;
-    }*/
-    
-    
-    
-    static class Compound{
+    }
+     */
+    public static JSONArray getCompoundsArray() {
+        return compoundsArray;
+    }
+
+    public static void setCompoundsArray(JSONArray compoundsArray) {
+        SDFBean.compoundsArray = compoundsArray;
+    }
+
+    static class Compound {
+
         public String structure;
         public Map<String, String> dataItems;
-        
-        public Compound(){
+
+        public Compound() {
             structure = "";
             dataItems = new HashMap<>();
         }
