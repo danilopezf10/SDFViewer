@@ -6,10 +6,11 @@
     </head>
     <body>
         <form id="form" >
-            File:<input type="file" name="file" id="the-file" accept=".sdf" onchange="performAjaxSubmit();" />
-            <input type="button" id="button" value="OK" onClick="readJson();"/> 
+            Select file: <input type="file" name="file" id="the-file" accept=".sdf" onchange="performAjaxSubmit();" />
+            <input type="button" id="button" value="OK" onClick="readJson();"/> <br><br>
+            Filter: <input type="text" id="filter" onkeyup="filterAttributes();" placeholder="Search attributes.."/><br><br>
         </form>
-        <div id="data"></div>
+        <table id="data"></table>
 
         <script type="text/javascript">
             function performAjaxSubmit() {
@@ -27,22 +28,56 @@
             function readJson() {
                 $.getJSON("SDFServlet", function (compounds) {
                     $.each(compounds, function (i, items) {
-                        var table = $('<table>').appendTo($('#data'));
+                        //var table = $('<table>').appendTo($('#data'));
                         $.each(items, function (name, val) {
                             if (name !== "Structure") {
-                                var row = $('<tr>').appendTo(table);
+                                var row = $('<tr>').appendTo('#data');
                                 $('<td>').text(name).appendTo(row);
                                 $('<td>').text(val).appendTo(row);
                             }
                         });
-                        $('<tr>').appendTo(table);
-                        $('<tr>').appendTo(table);
-                        $('<tr>').appendTo(table);
-                        $('<tr>').appendTo(table);
+                        var row = $('<tr>').appendTo('#data');
+                        $('<br><br>').appendTo(row);
                     });
                 });
             }
             ;
+        </script>
+        <script type="text/javascript">
+            function filterAttributes() {
+                var input, filter, table, tr, td, i, j;
+                input = document.getElementById('filter');
+                filter = input.value.toUpperCase();
+                table = document.getElementById('data');
+                tr = table.getElementsByTagName("tr");
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[0];
+                    if (td) {
+                        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+            ;
+            /*
+             tr = table.getElementsByTagName('tr');
+             for (i = 0; i < tr.length; i++) {
+             td = td[i].getElementsByTagName('td');
+             for(j = 0; j < td.length; j++){
+             td = tr[i].getElementsByTagName('td')[j];
+             if (td) {
+             if (td.innerHTML.toUpperCase().indexOf(filter) > -1 ) {
+             tr[i].style.display = "";
+             } else {
+             tr[i].style.display = "none";
+             }
+             }
+             }
+             }
+             */
         </script>
     </body>
 </html>
