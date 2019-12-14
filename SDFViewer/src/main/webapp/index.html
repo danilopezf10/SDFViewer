@@ -5,9 +5,42 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
+        <!--
         <form action="SDFServlet" method="post" enctype="multipart/form-data">
             File:<input type="file" name="file" accept=".sdf"/><p/>
             <input type="submit" value="OK" />
         </form>
+        -->
+        
+        <form id="form" >
+            File:<input type="file" name="file" id="the-file" accept=".sdf" /><p/>
+            <input type="button" id="button" value="OK" onClick="performAjaxSubmit();"/> 
+        </form>
+        <script type="text/javascript">
+            function performAjaxSubmit() {
+                var file = document.getElementById('the-file').files[0];
+                var formdata = new FormData();
+                formdata.append('file', file);
+                var xhr = new XMLHttpRequest();
+                xhr.open("post", "SDFServlet", true);
+                xhr.send(formdata);
+               /* 
+                xhr.onload = function (e) {
+                    if (this.status === 200) {
+                       alert(this.responseText);
+                    }
+                };*/
+            };
+            
+        /*    $.getJSON('SDFServlet', function (data) {
+                var table = $('<table>').appendTo($('#data'));
+                $.each(data, function (i, compound) {
+                    var row = $('<tr>').appendTo(table);
+                    $('<td>').text(compound.Chemical_Name).appendTo(row);
+                    $('<td>').text(compound.ID).appendTo(row);
+                });
+            });*/
+        </script>
+        
     </body>
 </html>

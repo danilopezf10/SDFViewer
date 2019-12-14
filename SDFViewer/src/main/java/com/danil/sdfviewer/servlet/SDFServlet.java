@@ -10,8 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.danil.sdfviewer.bean.SDFBean;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
 
@@ -75,10 +77,34 @@ public class SDFServlet extends HttpServlet {
             //String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
             InputStream fileContent = filePart.getInputStream();
             SDFBean.generateJsonFile(fileContent);
+            SDFBean.readJsonFile();
 
         } catch (Exception ex) {
             Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //response.setContentType("application/json");
+        //response.setCharacterEncoding("UTF-8");
+        //String json = SDFBean.getJsonCompoundsList().get(0).toString();
+       // response.getWriter().write(json);	
+    /*  String ajaxUpdateResult = "";
+        try {
+            List items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);            
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+                    String fileName = item.getName();
+                    InputStream content = item.getInputStream();
+                    response.setContentType("text/plain");
+                    response.setCharacterEncoding("UTF-8");
+                    // Do whatever with the content InputStream.
+                    System.out.println(Streams.asString(content));
+                    ajaxUpdateResult += "File " + fileName + " is successfully uploaded\n\r";
+                }
+            }
+        } catch (FileUploadException e) {
+            throw new ServletException("Parsing file upload failed.", e);
+        }
+        response.getWriter().print(ajaxUpdateResult);
+      */
     }
 
     /**
