@@ -7,13 +7,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.danil.sdfviewer.bean.SDFBean;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
+import com.danil.sdfviewer.bean.SDFBean;
 
 /**
  *
@@ -56,7 +55,7 @@ public class SDFServlet extends HttpServlet {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             String jsonArray = SDFBean.getCompoundsArray().toJSONString();
-            response.getWriter().write(jsonArray);
+            response.getWriter().write(jsonArray);      //Sends back the json file as an array
         } catch (IOException ex) {
             Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,11 +73,9 @@ public class SDFServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            Part filePart = request.getPart("file");        // Retrieves <input type="file" name="file">
-            //String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            Part filePart = request.getPart("file");        //Retrieves <input type="file" name="file">
             InputStream fileContent = filePart.getInputStream();
             SDFBean.generateJsonFile(fileContent);
-            //SDFBean.readJsonFile();
         } catch (Exception ex) {
             Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
