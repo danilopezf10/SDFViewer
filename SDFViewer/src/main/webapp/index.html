@@ -1,19 +1,37 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+
         <title>SDFViewer</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
         <form id="form" >
-            Select file: <input type="file" name="file" id="the-file" accept=".sdf" onchange="performAjaxSubmit();" />
-            <input type="button" id="button" value="OK" onClick="readJson();"/> <br><br>
-            Filter: <input type="text" id="filter" onkeyup="filterAttributes();" placeholder="Search attributes.."/><br><br>
+            <div class="form-group ml-3 mt-3">
+                <label for="the-file" >Select SD file </label><br>
+                <input type="file" name="file" id="the-file" accept=".sdf" class="btn btn-primary" onchange="performAjaxSubmit();" />
+                <input type="button" id="button" value="Submit" class="btn btn-primary" disabled="disabled" onClick="readJson();"/> <br>
+            </div>
+            <div class="form-group row ml-3" >
+                <div class="col-xs-2">
+                    <label for="filter" >Filter attributes</label>
+                    <input type="text" id="filter" class="form-control" placeholder="Search attributes.." onkeyup="filterAttributes();" />
+                </div>
+            </div>
         </form>
-        <table id="data"></table>
 
-        <script type="text/javascript">
+        <table id="data" class="table-hover ml-3" ></table>
+
+        <script>
+            document.getElementById('filter').value = "";
+            document.getElementById('filter').disabled = true;
+        </script>
+        <script>
             function performAjaxSubmit() {
+                document.getElementById('button').disabled = false;
                 var file = document.getElementById('the-file').files[0];
                 var formdata = new FormData();
                 formdata.append('file', file);
@@ -23,15 +41,16 @@
             }
             ;
         </script>
-        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script>
             function readJson() {
+                $("#data tbody tr").remove();
+                document.getElementById('filter').disabled = false;
                 $.getJSON("SDFServlet", function (compounds) {
                     $.each(compounds, function (i, items) {
                         //var table = $('<table>').appendTo($('#data'));
                         $.each(items, function (name, val) {
                             if (name !== "Structure") {
-                                var row = $('<tr>').appendTo('#data');
+                                var row = $('<tr style="border-bottom: 1px solid #ccc;">').appendTo('#data');
                                 $('<td>').text(name).appendTo(row);
                                 $('<td>').text(val).appendTo(row);
                             }
@@ -43,7 +62,7 @@
             }
             ;
         </script>
-        <script type="text/javascript">
+        <script>
             function filterAttributes() {
                 var input, filter, table, tr, td, i, j;
                 input = document.getElementById('filter');
@@ -62,22 +81,56 @@
                 }
             }
             ;
-            /*
-             tr = table.getElementsByTagName('tr');
-             for (i = 0; i < tr.length; i++) {
-             td = td[i].getElementsByTagName('td');
-             for(j = 0; j < td.length; j++){
-             td = tr[i].getElementsByTagName('td')[j];
-             if (td) {
-             if (td.innerHTML.toUpperCase().indexOf(filter) > -1 ) {
-             tr[i].style.display = "";
-             } else {
-             tr[i].style.display = "none";
-             }
-             }
-             }
-             }
-             */
         </script>
+        <!--        <script>
+                    function generateImageFromMol() {
+                        var obj = new Object();
+                        obj.chemData = "untitled.mol  ChemDraw02191907502D\n\n 31 30  0  0  0  0  0  0  0  0999 V2000\n   -1.7284    0.6408    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.7284   -3.3509    0.0000 O   0  5  0  0  0  0  0  0  0  0  0  0\n   -2.8807   -1.3550    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5761    2.6368    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    1.7284   -0.0245    0.0000 N   0  3  0  0  0  0  0  0  0  0  0  0\n    0.5761    0.6408    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5761   -0.0245    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.8807   -0.6897    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    2.3937    1.1278    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.0632   -1.1768    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5761   -1.3550    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.7284   -2.0202    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -1.7284    1.9715    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.8807    2.6368    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0\n    1.1063    1.2727    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0459    1.2727    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.5761    0.8005    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    2.4682   -1.4042    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.5952   -1.1022    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.2932    0.0248    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    3.1081    0.7153    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    2.8062    1.8423    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.6795    1.5403    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.3490   -0.7642    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.6507   -1.8912    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    1.7776   -1.5893    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -0.2940   -2.1302    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n    0.2362   -1.2117    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -2.4682    3.3509    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.5952    3.0493    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n   -3.2932    1.9223    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0\n  1  7  1  0      \n  1 13  1  0      \n  2 12  1  0      \n  3 12  2  0      \n  4 13  2  0      \n  5  6  1  0      \n  5  8  1  0      \n  5  9  1  0      \n  5 10  1  0      \n  6  7  1  0      \n  6 15  1  0      \n  6 16  1  0      \n  7 11  1  0      \n  7 17  1  0      \n  8 18  1  0      \n  8 19  1  0      \n  8 20  1  0      \n  9 21  1  0      \n  9 22  1  0      \n  9 23  1  0      \n 10 24  1  0      \n 10 25  1  0      \n 10 26  1  0      \n 11 12  1  0      \n 11 27  1  0      \n 11 28  1  0      \n 13 14  1  0      \n 14 29  1  0      \n 14 30  1  0      \n 14 31  1  0      \nM  CHG  2   2  -1   5   1\nM  END";
+                        obj.chemDataType = "chemical/x-mdl-molfile";
+                        obj.imageType = "image/png";
+                        var jsonString = JSON.stringify(obj);
+                        $.ajax({
+                            type: "post",
+                            url: "https://chemdrawdirect.perkinelmer.cloud/rest/generateImage",
+                            data: jsonString,
+                            contentType: "application/json; charset=utf-8",
+                            traditional: true,
+                            success: function (data) {
+                                /* var en = new PNGEncoder(9);
+                                 var pngFile = en.encode(data, 9);
+                                 document.getElementById('image_div').innerHTML='<img src="' + pngFile + '" />';*/
+                                document.getElementById('image_div').innerHTML = '<img src="data:image/png;base64,' + data + '" />';
+                                // document.getElementById('image_div').appendChild('<img src="data:image/png;base64,' + data + '" />');
+                            }
+                        });
+                    }
+                    ;
+                    /*
+                     $(document).ready(function() {
+                     $.ajax({
+                     type: "post",
+                     url:'"https://chemdrawdirect.perkinelmer.cloud/rest/generateImage"',
+                     contentType: "image/png",
+                     data: "id_projet=[% visual.projet.id %]",
+                     success: function(data){
+                     $('.div_imagetranscrits').html('<img src="' + data + '" />'); },
+                     });
+                     };*/
+                    /*function generateImageFromMol() {
+                     var xhr = new XMLHttpRequest();
+                     xhr.open("post", "https://chemdrawdirect.perkinelmer.cloud/rest/generateImage", true);
+                     // xhr.send(the json);
+                     xhr.onreadystatechange=function(){
+                     if(this.readyState===4){
+                     var image = xhr.responseXML;
+                     }
+                     };
+                     }
+                     ;*/
+                </script> -->
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
     </body>
 </html>
