@@ -83,7 +83,7 @@ public class SDFServlet extends HttpServlet {
             Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex);
             try {
                 JSONParser parser = new JSONParser();
-                SDFBean.setCompoundsArray((JSONArray)parser.parse("[{\"ERROR:\": \"Invalid .sdf file, please check format errors\"}]"));
+                SDFBean.setCompoundsArray((JSONArray)parser.parse("[{\"ERROR\": \"Invalid .sdf file, please check format errors\"}]"));
             } catch (ParseException ex1) {
                 Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex1);
             }     

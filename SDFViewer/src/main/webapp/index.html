@@ -10,21 +10,21 @@
     </head>
     <body>
         <form id="form" >
-            <div class="form-group ml-3 mt-3">
+            <div class="form-group ml-4 mt-4">
                 <label for="the-file" >Select SD file </label><br>
                 <input type="file" name="file" id="the-file" accept=".sdf" class="btn btn-info" onchange="performAjaxSubmit();" />
                 <input type="button" id="button" value="OK" class="btn btn-info" disabled="disabled" onClick="readJson();"/> <br>
             </div>
-            <div class="form-group ml-3" >
+            <div class="form-group ml-4" >
                 <div >
-                    <label for="filter" >Filter attributes</label>
-                    <input type="text" id="filter" style="width: 310px;" class="form-control" placeholder="Search attributes.." onkeyup="filterAttributes();" onkeydown="return (event.keyCode !== 13);" /> <!-- Last attribute = ignore Enter key -->
+                    <label for="filter" >Filter attributes</label>                                                                                                         <!-- ignore Enter key -->
+                    <input type="text" id="filter" style="width: 310px;" class="form-control" placeholder="Search attributes.." onkeyup="filterAttributes();" onkeydown="return (event.keyCode !== 13);" />
                 </div>
             </div>
         </form>
-        
-        <div id="data" class="ml-3"></div>
-          
+
+        <div id="data" class="ml-4"></div>
+
         <script>
             document.getElementById('filter').value = "";
             document.getElementById('filter').disabled = true;
@@ -46,19 +46,22 @@
                 $("#data img").remove();      //Empty table before adding new elements
                 $("#data table").remove();
                 $("#data tr").remove();
+                $("#filter").val("");
                 document.getElementById('filter').disabled = false;
                 document.getElementById('button').disabled = true;  //Disable button until images are rendered to prevent double clicking
                 $.getJSON("SDFServlet", function (compounds) {
                     $.each(compounds, function (i, items) {
                         var table = $('<table  class="table-bordered table-hover" >').appendTo('#data');
                         var div4images = $('<div>').appendTo('#data');      //Append <div> after each compound table to insert images later
-                        $.each(items, function (name, val) { 
-                            if (name !== "Structure") {
+                        $.each(items, function (name, val) {
+                            if (name === "Structure") {
+                                renderImage(val, div4images);
+                            } else if (name === "ERROR") {
+                                alert(val);
+                            } else {
                                 var row = $('<tr>').appendTo(table);
                                 $('<td>').text(name).appendTo(row);
                                 $('<td>').text(val).appendTo(row);
-                            }else{
-                                renderImage(val, div4images);
                             }
                         });
                         var row = $('<tr>').appendTo('#data');
@@ -90,7 +93,7 @@
         </script>
         <script>
 
-           function renderImage(str, div) {
+            function renderImage(str, div) {
                 var obj = new Object();
                 obj.chemData = str;
                 obj.chemDataType = "chemical/x-mdl-molfile";
@@ -104,14 +107,14 @@
                     traditional: true,
                     mimeType: "text/plain; charset=x-user-defined",
                     success: function (data) {
-                        var imgData64 = base64encode(data);     
-                        $('<img src="data:image/png;base64,'+ imgData64 +'" width="25%" height="25%" />').appendTo(div);
+                        var imgData64 = base64encode(data);
+                        $('<img src="data:image/png;base64,' + imgData64 + '" width="25%" height="25%" />').appendTo(div);
                         document.getElementById('button').disabled = false;
                     }
                 });
             }
             ;
-            
+
         </script> 
         <script src="base64encoder.js"></script>
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
