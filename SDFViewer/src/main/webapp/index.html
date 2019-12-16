@@ -47,6 +47,7 @@
                 $("#data table").remove();
                 $("#data tr").remove();
                 document.getElementById('filter').disabled = false;
+                document.getElementById('button').disabled = true;  //Disable button until images are rendered to prevent double clicking
                 $.getJSON("SDFServlet", function (compounds) {
                     $.each(compounds, function (i, items) {
                         var table = $('<table  class="table-bordered table-hover" >').appendTo('#data');
@@ -105,6 +106,7 @@
                     success: function (data) {
                         var imgData64 = base64encode(data);     
                         $('<img src="data:image/png;base64,'+ imgData64 +'" width="25%" height="25%" />').appendTo(div);
+                        document.getElementById('button').disabled = false;
                     }
                 });
             }

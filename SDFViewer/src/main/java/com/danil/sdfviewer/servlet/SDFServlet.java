@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
 import com.danil.sdfviewer.bean.SDFBean;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -78,6 +81,12 @@ public class SDFServlet extends HttpServlet {
             SDFBean.generateJsonFile(fileContent);
         } catch (Exception ex) {
             Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                JSONParser parser = new JSONParser();
+                SDFBean.setCompoundsArray((JSONArray)parser.parse("[{\"ERROR:\": \"Invalid .sdf file, please check format errors\"}]"));
+            } catch (ParseException ex1) {
+                Logger.getLogger(SDFServlet.class.getName()).log(Level.SEVERE, null, ex1);
+            }     
         }
     }
 

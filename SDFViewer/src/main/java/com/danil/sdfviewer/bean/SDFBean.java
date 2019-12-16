@@ -31,7 +31,7 @@ public class SDFBean {
         lines.add("[");
         while (st != null) {
             lines.add("  {");
-            String structure = "    \"Structure\": \"" + st+ "\\r\\n";
+            String structure = "    \"Structure\": \"" + st + "\\r\\n";
             while ((st = br.readLine()).compareTo("M  END") != 0) {   //Read .mol file data, write it to "Structure" field
                 structure = structure + st + "\\r\\n";
             }
@@ -56,13 +56,16 @@ public class SDFBean {
                 lines.add("  }");
             }
         }
+        if (lines.size() == 1) {        //Uploaded file is empty
+            throw new Exception();
+        }
         lines.add("]");
+
         String filePath = System.getProperty("java.io.tmpdir") + "\\sdfv_output.json";
         Path file = Paths.get(filePath);
         Files.write(file, lines, StandardCharsets.UTF_8);       //Create json file at temporary-files directory
         JSONParser parser = new JSONParser();
         compoundsArray = (JSONArray) parser.parse(new FileReader(filePath));
-
     }
 
     public static JSONArray getCompoundsArray() {
