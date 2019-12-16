@@ -15,16 +15,16 @@
                 <input type="file" name="file" id="the-file" accept=".sdf" class="btn btn-info" onchange="performAjaxSubmit();" />
                 <input type="button" id="button" value="OK" class="btn btn-info" disabled="disabled" onClick="readJson();"/> <br>
             </div>
-            <div class="form-group row ml-3" >
-                <div class="col-xs-2">
+            <div class="form-group ml-3" >
+                <div >
                     <label for="filter" >Filter attributes</label>
-                    <input type="text" id="filter" class="form-control" placeholder="Search attributes.." onkeyup="filterAttributes();" onkeydown="return (event.keyCode !== 13);" /> <!-- Last attribute = ignore Enter key -->
+                    <input type="text" id="filter" style="width: 310px;" class="form-control" placeholder="Search attributes.." onkeyup="filterAttributes();" onkeydown="return (event.keyCode !== 13);" /> <!-- Last attribute = ignore Enter key -->
                 </div>
             </div>
         </form>
-
-        <table id="data" class="table-hover ml-3" ></table>
-
+        
+        <div id="data" class="ml-3"></div>
+          
         <script>
             document.getElementById('filter').value = "";
             document.getElementById('filter').disabled = true;
@@ -43,15 +43,21 @@
         </script>
         <script>
             function readJson() {
-                $("#data tbody tr").remove();       //Empty table before adding new elements
+                $("#data img").remove();      //Empty table before adding new elements
+                $("#data table").remove();
+                $("#data tr").remove();
                 document.getElementById('filter').disabled = false;
                 $.getJSON("SDFServlet", function (compounds) {
                     $.each(compounds, function (i, items) {
-                        $.each(items, function (name, val) {
+                        var table = $('<table  class="table-bordered table-hover" >').appendTo('#data');
+                        var div4images = $('<div>').appendTo('#data');      //Append <div> after each compound table to insert images later
+                        $.each(items, function (name, val) { 
                             if (name !== "Structure") {
-                                var row = $('<tr style="border-bottom: 1px solid #ccc;">').appendTo('#data');
+                                var row = $('<tr>').appendTo(table);
                                 $('<td>').text(name).appendTo(row);
                                 $('<td>').text(val).appendTo(row);
+                            }else{
+                                renderImage(val, div4images);
                             }
                         });
                         var row = $('<tr>').appendTo('#data');
@@ -81,6 +87,31 @@
             }
             ;
         </script>
+        <script>
+
+           function renderImage(str, div) {
+                var obj = new Object();
+                obj.chemData = str;
+                obj.chemDataType = "chemical/x-mdl-molfile";
+                obj.imageType = "image/png";
+                var jsonString = JSON.stringify(obj);
+                $.ajax({
+                    type: "post",
+                    url: "https://chemdrawdirect.perkinelmer.cloud/rest/generateImage",
+                    data: jsonString,
+                    contentType: "application/json; charset=utf-8",
+                    traditional: true,
+                    mimeType: "text/plain; charset=x-user-defined",
+                    success: function (data) {
+                        var imgData64 = base64encode(data);     
+                        $('<img src="data:image/png;base64,'+ imgData64 +'" width="25%" height="25%" />').appendTo(div);
+                    }
+                });
+            }
+            ;
+            
+        </script> 
+        <script src="base64encoder.js"></script>
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>

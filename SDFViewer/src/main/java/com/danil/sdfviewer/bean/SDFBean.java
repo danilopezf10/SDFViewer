@@ -31,11 +31,11 @@ public class SDFBean {
         lines.add("[");
         while (st != null) {
             lines.add("  {");
-            String structure = "    \"Structure\": \"" + st;
+            String structure = "    \"Structure\": \"" + st+ "\\r\\n";
             while ((st = br.readLine()).compareTo("M  END") != 0) {   //Read .mol file data, write it to "Structure" field
-                structure = structure + st + "\\n";
+                structure = structure + st + "\\r\\n";
             }
-            lines.add(structure + st + "\",");
+            lines.add(structure + st + "\\r\\n\",");
 
             st = br.readLine();
             while (st.compareTo("$$$$") != 0) {     //Read the rest of items
