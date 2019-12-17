@@ -2,6 +2,7 @@ package com.danil.sdfviewer.bean;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +14,7 @@ import java.util.List;
 import javax.ejb.Stateful;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -21,14 +23,23 @@ import org.json.simple.parser.JSONParser;
 @Stateful
 public class SDFBean {
 
+    private static final String FILEPATH = System.getProperty("java.io.tmpdir") + "\\sdfv_output.json";     //Path to temp-files directory
     private static JSONArray compoundsArray;
 
-    public static void generateJsonFile(InputStream fileContent) throws Exception {
+    public static void generateJsonFile(InputStream fileContent) throws IOException, ParseException {
+        List<String> lines = readSDF(fileContent);
+        Path file = Paths.get(FILEPATH);
+        Files.write(file, lines, StandardCharsets.UTF_8);
+        JSONParser parser = new JSONParser();
+        compoundsArray = (JSONArray) parser.parse(new FileReader(FILEPATH));
+    }
+
+    private static List<String> readSDF(InputStream fileContent) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(fileContent));
         List<String> lines = new ArrayList<>();
-
         String st = br.readLine();
         lines.add("[");
+
         while (st != null) {
             lines.add("  {");
             String structure = "    \"Structure\": \"" + st + "\\r\\n";
@@ -57,18 +68,17 @@ public class SDFBean {
             }
         }
         if (lines.size() == 1) {        //Uploaded file is empty
-            throw new Exception();
+            throw new IOException();
         }
         lines.add("]");
 
-        String filePath = System.getProperty("java.io.tmpdir") + "\\sdfv_output.json";
-        Path file = Paths.get(filePath);
-        Files.write(file, lines, StandardCharsets.UTF_8);       //Create json file at temporary-files directory
-        JSONParser parser = new JSONParser();
-        compoundsArray = (JSONArray) parser.parse(new FileReader(filePath));
+        return lines;
     }
 
     public static JSONArray getCompoundsArray() {
+        if (compoundsArray == null) {
+            compoundsArray = new JSONArray();
+        }
         return compoundsArray;
     }
 
