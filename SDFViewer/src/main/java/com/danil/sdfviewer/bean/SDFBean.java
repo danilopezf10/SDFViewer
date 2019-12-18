@@ -26,7 +26,7 @@ public class SDFBean {
     private static final String FILEPATH = System.getProperty("java.io.tmpdir") + "\\sdfv_output.json";     //Path to temp-files directory
     private static JSONArray compoundsArray;
 
-    public static void generateJsonFile(InputStream fileContent) throws IOException, ParseException {
+    public static void generateJsonFile(InputStream fileContent) throws IOException, ParseException, InvalidSDFileException {
         List<String> lines = readSDF(fileContent);
         Path file = Paths.get(FILEPATH);
         Files.write(file, lines, StandardCharsets.UTF_8);
@@ -34,43 +34,48 @@ public class SDFBean {
         compoundsArray = (JSONArray) parser.parse(new FileReader(FILEPATH));
     }
 
-    private static List<String> readSDF(InputStream fileContent) throws IOException {
+    private static List<String> readSDF(InputStream fileContent) throws InvalidSDFileException, IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(fileContent));
         List<String> lines = new ArrayList<>();
-        String st = br.readLine();
-        lines.add("[");
+        try {
+            String st = br.readLine();
+            lines.add("[");
 
-        while (st != null) {
-            lines.add("  {");
-            String structure = "    \"Structure\": \"" + st + "\\r\\n";
-            while ((st = br.readLine()).compareTo("M  END") != 0) {   //Read .mol file data, write it to "Structure" field
-                structure = structure + st + "\\r\\n";
-            }
-            lines.add(structure + st + "\\r\\n\",");
+            while (st != null) {
+                lines.add("  {");
+                String structure = "    \"Structure\": \"" + st + "\\r\\n";
+                while ((st = br.readLine()).compareTo("M  END") != 0) {   //Read .mol file data, write it to "Structure" field
+                    structure = structure + st + "\\r\\n";
+                }
+                lines.add(structure + st + "\\r\\n\",");
 
-            st = br.readLine();
-            while (st.compareTo("$$$$") != 0) {     //Read the rest of items
-                String itemName = "    \"" + st.substring(st.indexOf('<') + 1, st.lastIndexOf('>')) + "\": \"";
-                String itemValues = "";
-                while ((st = br.readLine()).compareTo("") != 0) {
-                    itemValues = itemValues + st + " ";
+                st = br.readLine();
+                while (st.compareTo("$$$$") != 0) {     //Read the rest of items
+                    String itemName = "    \"" + st.substring(st.indexOf('<') + 1, st.lastIndexOf('>')) + "\": \"";
+                    String itemValues = "";
+                    while ((st = br.readLine()).compareTo("") != 0) {
+                        itemValues = itemValues + st + " ";
+                    }
+                    if ((st = br.readLine()).compareTo("$$$$") != 0) {    //We've got more items in the compound
+                        lines.add(itemName + itemValues.trim() + "\",");
+                    } else {
+                        lines.add(itemName + itemValues.trim() + "\"");
+                    }
                 }
-                if ((st = br.readLine()).compareTo("$$$$") != 0) {    //We've got more items in the compound
-                    lines.add(itemName + itemValues.trim() + "\",");
-                } else {
-                    lines.add(itemName + itemValues.trim() + "\"");
+                if ((st = br.readLine()) != null) {     //We've got more compounds to read
+                    lines.add("  },");
+                } else {                              //We are done reading the file
+                    lines.add("  }");
                 }
             }
-            if ((st = br.readLine()) != null) {     //We've got more compounds to read
-                lines.add("  },");
-            } else {                              //We are done reading the file
-                lines.add("  }");
-            }
+            lines.add("]");
+
+        } catch (NullPointerException ex) {
+            throw new InvalidSDFileException("Invalid .sdf file, please check format errors");
         }
-        if (lines.size() == 1) {        //Uploaded file is empty
-            throw new IOException();
+        if (lines.size() == 2) {
+            throw new InvalidSDFileException("Uploaded file is empty");
         }
-        lines.add("]");
 
         return lines;
     }
