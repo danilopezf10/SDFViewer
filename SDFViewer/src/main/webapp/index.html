@@ -46,13 +46,15 @@
                 $("#data img").remove();      //Empty table before adding new elements
                 $("#data table").remove();
                 $("#data tr").remove();
+                $("#data div").remove();
                 $("#filter").val("");
                 document.getElementById('filter').disabled = false;
                 document.getElementById('button').disabled = true;  //Disable button until images are rendered to prevent double clicking
                 $.getJSON("SDFServlet", function (compounds) {
                     $.each(compounds, function (i, items) {
-                        var table = $('<table  class="table-bordered table-hover" >').appendTo('#data');
-                        var div4images = $('<div>').appendTo('#data');      //Append <div> after each compound table to insert images later
+                        var div = $('<div>').appendTo('#data');
+                        var table = $('<table class="table-bordered table-hover" style="display:inline-block;">').appendTo(div);
+                        var div4images = $('<div style="display:inline-block; vertical-align:top; margin-left:10px">').appendTo(div);      //Append <div> after each compound table to insert images later
                         $.each(items, function (name, val) {
                             if (name === "Structure") {
                                 renderImage(val, div4images);
@@ -108,7 +110,7 @@
                     mimeType: "text/plain; charset=x-user-defined",
                     success: function (data) {
                         var imgData64 = base64encode(data);
-                        $('<img src="data:image/png;base64,' + imgData64 + '" width="25%" height="25%" />').appendTo(div);
+                        $('<img src="data:image/png;base64,' + imgData64 + '"  style="max-height:220px; max-width:220px;"/>').appendTo(div);
                         document.getElementById('button').disabled = false;
                     }
                 });
